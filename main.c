@@ -122,7 +122,7 @@ list_prepend (List *list, void *data)
     else
         list = elem;
 
-    return list;
+    return elem;
 }
 
 static void
