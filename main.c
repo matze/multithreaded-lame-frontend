@@ -111,22 +111,14 @@ path_join (const char *prefix, const char *basename)
 }
 
 static List *
-list_append (List *list, void *data)
+list_prepend (List *list, void *data)
 {
-    List *elem;
-
-    elem = malloc (sizeof (List));
+    List *elem = malloc (sizeof (List));
     elem->data = data;
     elem->next = NULL;
 
-    if (list != NULL) {
-        List *it = list;
-
-        for (; it->next != NULL; it = it->next)
-            ;
-
-        it->next = elem;
-    }
+    if (list != NULL)
+        elem->next = list;
     else
         list = elem;
 
@@ -160,7 +152,7 @@ get_valid_file_names (const char* root)
             char *path = path_join (root, entry->d_name);
 
             if (is_potential_wav_file (path))
-                list = list_append (list, path);
+                list = list_prepend (list, path);
             else
                 free (path);
         }
@@ -180,7 +172,7 @@ get_valid_file_names (const char* root)
             char *path = path_join (root, info.cFileName);
 
             if (is_potential_wav_file (path))
-                list = list_append (list, path);
+                list = list_prepend (list, path);
             else
                 free (path);
         } while (FindNextFile (entry, &info) != 0);
@@ -364,7 +356,7 @@ thread_pool_submit (ThreadPool *pool, ThreadFunc func, void *data)
     thread = malloc (sizeof (pthread_t));
     pthread_create (thread, NULL, (ThreadFunc) thread_pool_runner, thread_data);
     pool->num_busy++;
-    pool->threads = list_append (pool->threads, thread);
+    pool->threads = list_prepend (pool->threads, thread);
 
     pthread_mutex_unlock (&pool->mutex);
 }
