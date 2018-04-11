@@ -222,9 +222,9 @@ encode_mp3 (const char *wav_path)
     char *mp3_path;
     lame_t lame;
     WaveHeader header;
-    unsigned current;
     size_t read;
-    size_t num_samples;
+    int current;
+    int num_samples;
     int encoded;
     int out_length;
     int is_mono;
