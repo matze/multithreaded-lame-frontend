@@ -220,7 +220,7 @@ encode_mp3 (const char *wav_path)
     int encoded;
     int out_length;
     int is_mono;
-    unsigned char *out_data;
+    unsigned char *out_data = NULL;
     short int *in_data = NULL;
     Error *error = NULL;
 
