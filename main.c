@@ -108,7 +108,7 @@ path_join (const char *prefix, const char *basename)
 #ifndef _MSC_VER
     snprintf (path, length, "%s/%s", prefix, basename);
 #else
-	snprintf(path, length, "%s\\%s", prefix, basename);
+    snprintf(path, length, "%s\\%s", prefix, basename);
 #endif
     return path;
 }
@@ -172,24 +172,25 @@ get_valid_file_names (const char* root)
 
     closedir (dir);
 #else
-	char *search_path;
-	HANDLE entry;
-	WIN32_FIND_DATA info;
+    char *search_path;
+    HANDLE entry;
+    WIN32_FIND_DATA info;
 
-	search_path = path_join (root, "*");
-	entry = FindFirstFile (TEXT (search_path), &info);
+    search_path = path_join (root, "*");
+    entry = FindFirstFile (TEXT (search_path), &info);
 
-	if (entry != INVALID_HANDLE_VALUE) {
-		do {
-			char *path = path_join (root, info.cFileName);
-			if (is_wav_filename (path))
-				list = list_append (list, path);
-			else
-				free (path);
-		} while (FindNextFile (entry, &info) != 0);
-	}
+    if (entry != INVALID_HANDLE_VALUE) {
+        do {
+            char *path = path_join (root, info.cFileName);
 
-	free(search_path);
+            if (is_wav_filename (path))
+                list = list_append (list, path);
+            else
+                free (path);
+        } while (FindNextFile (entry, &info) != 0);
+    }
+
+    free(search_path);
 #endif
     return list;
 }
