@@ -2,6 +2,7 @@
 typedef unsigned __int16 uint16_t;
 typedef unsigned __int32 uint32_t;
 #define HAVE_STRUCT_TIMESPEC    1
+#include <Windows.h>
 #else
 #include <stdint.h>
 #include <unistd.h>
@@ -104,7 +105,11 @@ path_join (const char *prefix, const char *basename)
 
     length = strlen (prefix) + 1 + strlen (basename) + 1;
     path = malloc (length);
+#ifndef _MSC_VER
     snprintf (path, length, "%s/%s", prefix, basename);
+#else
+	snprintf(path, length, "%s\\%s", prefix, basename);
+#endif
     return path;
 }
 
@@ -146,20 +151,17 @@ list_free_full (List *list)
 static List *
 get_valid_file_names (const char* root)
 {
-    List *list;
+    List *list = NULL;
 
 #ifndef _MSC_VER
     DIR *dir;
     struct dirent *entry;
 
     dir = opendir (root);
-    list = NULL;
 
     if (dir) {
         while ((entry = readdir (dir)) != NULL) {
-            char *path;
-
-            path = path_join (root, entry->d_name);
+            char *path = path_join (root, entry->d_name);
 
             if (is_wav_filename (path))
                 list = list_append (list, path);
@@ -169,6 +171,25 @@ get_valid_file_names (const char* root)
     }
 
     closedir (dir);
+#else
+	char *search_path;
+	HANDLE entry;
+	WIN32_FIND_DATA info;
+
+	search_path = path_join (root, "*");
+	entry = FindFirstFile (TEXT (search_path), &info);
+
+	if (entry != INVALID_HANDLE_VALUE) {
+		do {
+			char *path = path_join (root, info.cFileName);
+			if (is_wav_filename (path))
+				list = list_append (list, path);
+			else
+				free (path);
+		} while (FindNextFile (entry, &info) != 0);
+	}
+
+	free(search_path);
 #endif
     return list;
 }
