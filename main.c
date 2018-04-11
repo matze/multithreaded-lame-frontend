@@ -231,7 +231,10 @@ encode_mp3 (const char *wav_path)
     wav = fopen (wav_path, "rb");
     mp3 = fopen (mp3_path, "wb");
 
-    fread (&header, sizeof (WaveHeader), 1, wav);
+    if (fread (&header, sizeof (WaveHeader), 1, wav) != 1) {
+        error = error_new (wav_path, "Could not read header");
+        goto cleanup;
+    }
 
     if (strncmp (header.riff.chunk_id, "RIFF", 4) || strncmp (header.riff.type, "WAVE", 4) ||
         strncmp (header.fmt.signature, "fmt ", 4) || strncmp (header.data.signature, "data", 4)) {
