@@ -91,7 +91,7 @@ is_potential_wav_file (const char *path)
     if (!(info.st_mode & S_IFREG) || (strlen (path) < 4))
         return 0;
 
-    return strcmp (path + strlen (path) - 4, ".wav") == 0 ? 1 : 0;
+    return strcmp (path + strlen (path) - 4, ".wav") == 0;
 }
 
 static char *
