@@ -267,7 +267,7 @@ encode_mp3 (const char *wav_path)
     lame_set_num_channels (lame, header.fmt.num_channels);
     lame_set_in_samplerate (lame, header.fmt.sample_rate);
     lame_set_out_samplerate (lame, header.fmt.sample_rate);
-    lame_set_mode (lame, is_mono == 1 ? MONO : STEREO);
+    lame_set_mode (lame, is_mono ? MONO : STEREO);
     lame_set_quality (lame, 3);
 
     if (lame_init_params (lame) < 0) {
