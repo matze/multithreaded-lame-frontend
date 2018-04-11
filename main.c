@@ -1,20 +1,21 @@
+#ifdef _MSC_VER
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+#define HAVE_STRUCT_TIMESPEC    1
+#else
+#include <stdint.h>
+#include <unistd.h>
+#include <dirent.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
 #include <errno.h>
-#include <unistd.h>
 
 #include <sys/stat.h>
 #include <pthread.h>
 #include <lame/lame.h>
-
-#ifdef _MSC_VER
-typedef unsigned __int16 uint16_t;
-typedef unsigned __int32 uint32_t;
-#else
-#include <stdint.h>
-#endif
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -145,9 +146,11 @@ list_free_full (List *list)
 static List *
 get_valid_file_names (const char* root)
 {
+    List *list;
+
+#ifndef _MSC_VER
     DIR *dir;
     struct dirent *entry;
-    List *list;
 
     dir = opendir (root);
     list = NULL;
@@ -166,6 +169,7 @@ get_valid_file_names (const char* root)
     }
 
     closedir (dir);
+#endif
     return list;
 }
 
