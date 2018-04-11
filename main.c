@@ -79,7 +79,7 @@ usage (const char *prog)
 }
 
 static int
-is_wav_filename (const char *path)
+is_potential_wav_file (const char *path)
 {
     struct stat info;
 
@@ -88,10 +88,7 @@ is_wav_filename (const char *path)
         return 0;
     }
 
-    if (!(info.st_mode & S_IFREG))
-        return 0;
-
-    if (strlen (path) < 4)
+    if (!(info.st_mode & S_IFREG) || (strlen (path) < 4))
         return 0;
 
     return strcmp (path + strlen (path) - 4, ".wav") == 0 ? 1 : 0;
@@ -108,7 +105,7 @@ path_join (const char *prefix, const char *basename)
 #ifndef _MSC_VER
     snprintf (path, length, "%s/%s", prefix, basename);
 #else
-    snprintf(path, length, "%s\\%s", prefix, basename);
+    snprintf (path, length, "%s\\%s", prefix, basename);
 #endif
     return path;
 }
@@ -140,9 +137,8 @@ static void
 list_free_full (List *list)
 {
     for (List *it = list; it != NULL;) {
-        List *tmp;
+        List *tmp = it;
         free (it->data);
-        tmp = it;
         it = it->next;
         free (tmp);
     }
@@ -163,7 +159,7 @@ get_valid_file_names (const char* root)
         while ((entry = readdir (dir)) != NULL) {
             char *path = path_join (root, entry->d_name);
 
-            if (is_wav_filename (path))
+            if (is_potential_wav_file (path))
                 list = list_append (list, path);
             else
                 free (path);
@@ -183,7 +179,7 @@ get_valid_file_names (const char* root)
         do {
             char *path = path_join (root, info.cFileName);
 
-            if (is_wav_filename (path))
+            if (is_potential_wav_file (path))
                 list = list_append (list, path);
             else
                 free (path);
