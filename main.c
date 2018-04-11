@@ -257,6 +257,7 @@ encode_mp3 (const char *wav_path)
     in_data = malloc (header.data.length);
     read = fread (in_data, 1, header.data.length, wav);
     is_mono = header.fmt.num_channels == 1;
+    num_samples = header.data.length / header.fmt.frame_size;
 
     if (header.data.length != read) {
         error = error_new (wav_path, "Not enough data to read");
@@ -273,8 +274,6 @@ encode_mp3 (const char *wav_path)
         error = error_new (wav_path, "LAME initialization failed");
         goto cleanup;
     }
-
-    num_samples = header.data.length / header.fmt.frame_size;
 
     for (current = 0; current < num_samples;) {
         read = MIN (FRAME_SIZE, num_samples - current);
